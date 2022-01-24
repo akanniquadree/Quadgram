@@ -9,18 +9,19 @@ const router = express.Router()
 router.post("/signin", async(req, res)=>{
     const {email, password} = req.body
     if(!email || !password){
-        return res.sendStatus(422).json({error:"Please fill all fields"})
+        return res.status(422).json({error:"Please fill all fields"})
     }
     await User.findOne({email:email}).then((savedUser)=>{
         if(!savedUser){
-            return res.sendStatus(422).json({error:"Wrong Credentials"})
+            return res.status(422).json({error:"Wrong Credentials"})
         }
         bcrypt.compare(password, savedUser.password).then(docMatch=>{
             if(docMatch){
                 const token = jwt.sign({_id:savedUser._id}, keys.JWT_SECRET)
-                res.json({token})
+                const {_id, name, email} = savedUser
+                return res.json({token, user:{_id, name, email}})
             }
-            return res.sendStatus(422).json({error:"Wrong Credentials"})
+            return res.status(422).json({error:"Wrong Credentials"})
         }).catch(err=>{
             console.log(err)
         })
@@ -32,14 +33,13 @@ router.post("/signin", async(req, res)=>{
 router.post("/signup", async(req, res)=>{
     const {name, email, password} = req.body
     if(!email || !password || !name){
-       return res.sendStatus(422).json({error:"Please fill all the require field"})
+       return res.status(422).json({error:"Please fill all the require field"})
     }
     await User.findOne({email:email}).then((savedUser)=>{
         if(savedUser){
-          return res.sendStatus(422).json({error:"User already exist with that Email"})  
+          return res.status(422).json({error:"User already exist with that Email"})  
         }
-        const salt = bcrypt.genSalt(12)
-        bcrypt.hash(password, salt).then(hashedPassword=>{
+        bcrypt.hash(password, 12).then(hashedPassword=>{
             const user = new User({
                 email,
                 password: hashedPassword,
