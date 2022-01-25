@@ -8,7 +8,7 @@ const postRouter = express.Router()
 
 //get all post
 postRouter.get("/posts", Login,async(req, res)=>{
-    await Post.find().populate("postedBy", "_id name").then(savedPost=>{
+    await Post.find().populate("postedBy", "_id name").populate("comments.postedBy", "_id name").then(savedPost=>{
         res.json(savedPost)
     }).catch(err=>{
         console.log(err)
@@ -81,5 +81,17 @@ postRouter.put("/comment", Login, async(req, res)=>{
         }
     })
 })
+
+postRouter.delete("/post/:postId",Login, async(req, res)=>{
+   Post.findOne({_id:req.params.postId}).populate("postedBy","_id").exec((err, post)=>{
+        if(err){
+            res.status(422).json({err:err})
+        }
+        if(post.postedBy._id.toString() === req.user._id.toString()){
+            post.remove().then(result=>{res.json(result)}).catch(err=>{console.log(err)})
+        }
+    })
+})
+
 
 export default postRouter

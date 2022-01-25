@@ -4,6 +4,7 @@ import keys from "./keys.js"
 import router from "./Routes/auth.js"
 import cors from "cors"
 import postRouter from "./Routes/Post.js"
+import userRouter from "./Routes/User.js"
 
 
 
@@ -26,6 +27,7 @@ app.use(express.json())
 app.use(cors())
 app.use("/api", router)
 app.use("/api", postRouter)
+app.use("/api", userRouter)
 
 
 
