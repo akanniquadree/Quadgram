@@ -18,8 +18,8 @@ router.post("/signin", async(req, res)=>{
         bcrypt.compare(password, savedUser.password).then(docMatch=>{
             if(docMatch){
                 const token = jwt.sign({_id:savedUser._id}, keys.JWT_SECRET)
-                const {_id, name, email} = savedUser
-                return res.json({token, user:{_id, name, email}})
+                const {_id, name, email,followers,following} = savedUser
+                return res.json({token, user:{_id, name, email,followers,following}})
             }
             return res.status(422).json({error:"Wrong Credentials"})
         }).catch(err=>{

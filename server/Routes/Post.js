@@ -93,5 +93,12 @@ postRouter.delete("/post/:postId",Login, async(req, res)=>{
     })
 })
 
+postRouter.get("/follpost", Login,async(req, res)=>{
+    await Post.find({postedBy:{$in:[req.user.following]}}).populate("postedBy", "_id name").populate("comments.postedBy", "_id name").then(savedPost=>{
+        res.json(savedPost)
+    }).catch(err=>{
+        console.log(err)
+    })
+})
 
 export default postRouter
